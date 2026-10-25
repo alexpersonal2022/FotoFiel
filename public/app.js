@@ -4,13 +4,23 @@ import { Selection } from './selection.js';
 import { BulkExport } from './bulk-export.js';
 import {encodeImage,downloadBlob} from './image-export.js';
 const $=id=>document.getElementById(id);
-const strengthLabel=document.createElement('label');strengthLabel.htmlFor='strength';strengthLabel.textContent='Intensidade da melhoria';
+const strengthLabel=document.createElement('label');strengthLabel.htmlFor='strength';strengthLabel.textContent='Luz e ambiente';
 const strengthSelect=document.createElement('select');strengthSelect.id='strength';
-for(const [value,label] of [['0.7','Suave'],['1','Equilibrada'],['1.4','Mais intensa']]){
+for(const [value,label] of [['0','Preservar iluminação'],['0.7','Suave'],['1','Equilibrada'],['1.4','Mais intensa']]){
   const option=document.createElement('option');option.value=value;option.textContent=label;option.selected=value==='1';strengthSelect.append(option);
 }
 const formatLabel=document.querySelector('label[for="format"]');formatLabel.before(strengthLabel,strengthSelect);
 strengthSelect.style.marginBottom='18px';
+for(const [id,title,choices] of [
+  ['definition','Definição e nitidez',[['0','Sem definição adicional'],['0.65','Suave'],['1','Equilibrada'],['1.5','Mais definição']]],
+  ['denoise','Redução de ruído',[['0','Desativada'],['1','Automática'],['1.5','Mais redução']]]
+]){
+  const label=document.createElement('label');label.htmlFor=id;label.textContent=title;
+  const select=document.createElement('select');select.id=id;select.className='quality-select';
+  for(const [value,name] of choices){const option=document.createElement('option');option.value=value;option.textContent=name;option.selected=value==='1';select.append(option);}
+  formatLabel.before(label,select);
+  select.onchange=()=>{if(selectedFile)loadFile(selectedFile,{preserveSelection:true});};
+}
 let worker, originalURL, resultURL, output, filename, selectedFile, busy=false;
 const status=message=>$('status').textContent=message;
 const error=message=>{$('error').textContent=message;$('error').hidden=false;};
@@ -28,7 +38,7 @@ function release(){
   for(const id of ['original','result'])$(id).removeAttribute('src');
   $('original-download').removeAttribute('href');
 }
-function setBusy(value){busy=value;document.body.classList.toggle('busy',value);$('file').disabled=value;$('clear').disabled=value;$('download').disabled=value;$('strength').disabled=value;$('format').disabled=value;$('bulk-format').disabled=value;styles.setBusy(value);selection.setBusy(value);}
+function setBusy(value){busy=value;document.body.classList.toggle('busy',value);$('file').disabled=value;$('clear').disabled=value;$('download').disabled=value;$('strength').disabled=value;$('definition').disabled=value;$('denoise').disabled=value;$('format').disabled=value;$('bulk-format').disabled=value;styles.setBusy(value);selection.setBusy(value);}
 function mode(value){
   document.querySelectorAll('[data-mode]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.mode===value)));
   $('result').style.clipPath=value==='result'?'none':value==='original'?'inset(0 100% 0 0)':'';
@@ -63,15 +73,15 @@ async function loadFile(file,{preserveSelection=false}={}){
     $('original-download').href=originalURL;$('original-download').download=file.name;
     filename=file.name.replace(/\.[^.]+$/,'').replace(/[^\p{L}\p{N}_-]/gu,'_').slice(0,80)||'foto';
     status('Ajustando iluminação e cores…');
-    worker=new Worker(new URL('./worker.js',import.meta.url),{type:'module'});
+    worker=new Worker(new URL('./worker.js?v=0.5.0',import.meta.url),{type:'module'});
     const processed=await new Promise((resolve,reject)=>{
       const timer=setTimeout(()=>reject(new Error('O processamento excedeu 2 minutos. Tente novamente ou use uma foto menor.')),120000);
       worker.onmessage=({data})=>{
         if(data.message){status(data.message);return;}
         clearTimeout(timer);data.error?reject(new Error(data.error)):resolve(data.pixels);
       };
-      worker.onerror=()=>{clearTimeout(timer);reject(new Error('Não foi possível iniciar o motor de imagem. Abra o aplicativo pelo endereço http://localhost:3000 em um navegador atualizado.'));};
-      worker.postMessage({pixels:pixels.data.buffer,width,height,strength:Number($('strength').value)},[pixels.data.buffer]);
+      worker.onerror=()=>{clearTimeout(timer);reject(new Error('Não foi possível iniciar o motor de imagem. Atualize a página ou tente abrir no Safari ou Chrome atualizado.'));};
+      worker.postMessage({pixels:pixels.data.buffer,width,height,strength:Number($('strength').value),detail:Number($('definition').value),denoise:Number($('denoise').value)},[pixels.data.buffer]);
     });
     worker.terminate();worker=null;
     ctx.putImageData(new ImageData(new Uint8ClampedArray(processed),width,height),0,0);
@@ -82,7 +92,8 @@ async function loadFile(file,{preserveSelection=false}={}){
     $('dimensions').textContent=`${width} × ${height} pixels · dimensões originais com orientação normalizada`;
     $('compare').value=50;$('stage').style.setProperty('--split','50%');mode('split');
     selectedFile=file;
-    $('upload').hidden=true;$('editor').hidden=false;status('Pronta. Compare e baixe sua fotografia melhorada.');
+    $('editor').dataset.engine='4';
+    $('upload').hidden=true;$('editor').hidden=false;status('Pronta. Luz, contraste local, ruído e definição ajustados. Amplie para conferir os detalhes.');
     selection.start(styles.previewBase,previousSelection);
   }catch(e){release();$('editor').hidden=true;$('upload').hidden=false;status('');error(e.message||'Não foi possível abrir esta fotografia.');}
   finally{if(canvas){canvas.width=canvas.height=1;}if(decoded)decoded.src='';setBusy(false);$('file').value='';}

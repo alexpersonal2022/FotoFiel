@@ -1,23 +1,23 @@
 [
   {
     "name": "public/index.html",
-    "bytes": 10768,
-    "sha256": "7baf7cae1c57b38a4f950539c4c20d4b209ff2f18b3d851a7bb121b92f395114"
+    "bytes": 10930,
+    "sha256": "a7777ec63b970762d289d41204c1c20cc5e096a154d54ccb79b8dc3eda7556ab"
   },
   {
     "name": "public/app.js",
-    "bytes": 7709,
-    "sha256": "94c9ce9b9cec3174e72316cbf16affb2cf099f693f8d3a1e44c3cd99ff13af1a"
+    "bytes": 8707,
+    "sha256": "46a8b0a4f69bbd27b229df5b6f6f626c3fd2d6069f26af737596dd01d4839a5d"
   },
   {
     "name": "public/engine.js",
-    "bytes": 4244,
-    "sha256": "66fe681a5b1b4bd391ec8a30f0fb43bec7c0b55a9e80561c6b064925e189716e"
+    "bytes": 10828,
+    "sha256": "aa9466d73a3dd4a5baec4ec976a7c118d8dc2363c0527d43541ba03c2c3e749d"
   },
   {
     "name": "public/worker.js",
-    "bytes": 524,
-    "sha256": "a2736769d3b1abd07b3294bd6a527136dd240347587d7fbe3692204ade618868"
+    "bytes": 568,
+    "sha256": "b62c2cd2f92d25754fd6d809526e70b505f55a71422179de92273fea8e67a1ce"
   },
   {
     "name": "public/image-format.js",
@@ -101,8 +101,8 @@
   },
   {
     "name": "public/theme.css",
-    "bytes": 8382,
-    "sha256": "b5c7927f181c64557945bcf70a4b2721f0d41778f197fbb0315a5340e408fbec"
+    "bytes": 8418,
+    "sha256": "e0183d6658ca4ad405ab75eff259e54334b3534d5f590864e56ae6aa60fe5e61"
   },
   {
     "name": "public/vendor/tf.min.js",

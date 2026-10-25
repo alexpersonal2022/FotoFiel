@@ -1,4 +1,5 @@
 /* Pastéis nas superfícies; tons profundos nos textos e controles. Sem fontes remotas. */
+.quality-select{margin-bottom:18px}
 :root{color-scheme:light;--green:#65428c;--muted:#655f76;--ink:#34314f;--pink:#fcebf3;--blue:#e7f3fc;--line:#e3dcea;font-family:'Segoe UI',Arial,sans-serif;color:var(--ink);background:#fcfafd}
 body{background:radial-gradient(ellipse 650px 420px at 5% 6%,#fbe6f0 0%,transparent 100%),radial-gradient(ellipse 680px 440px at 96% 16%,#e2f1fc 0%,transparent 100%),#fcfafd}
 header{max-width:1280px;padding-block:23px;border-color:var(--line)}
